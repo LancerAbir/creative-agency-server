@@ -17,9 +17,6 @@ const fileUpload = require("express-fileupload");
 const MongoClient = require("mongodb").MongoClient;
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.0evig.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
-//** PORT */
-const port = 7000;
-
 //** Mother App */
 const app = express();
 
@@ -42,6 +39,9 @@ app.use(middleware);
 //   databaseURL: "https://volunteer-mern-project.firebaseio.com"
 // });
 
+//** PORT */
+const port = 7000;
+
 //** Root Route */
 app.get("/", (req, res) => {
    res.send("Hello World!");
@@ -53,9 +53,19 @@ const client = new MongoClient(uri, {
    useUnifiedTopology: true,
 });
 client.connect((err) => {
+   //** MongoDB Collections list */
    const creativeAgencyCollection = client
       .db(`${process.env.DB_NAME}`)
       .collection(`${process.env.DB_COLLECTION}`);
+   const creativeAgencySingleCollection = client
+      .db(`${process.env.DB_NAME}`)
+      .collection(`${process.env.DB_COLLECTION2}`);
+   const creativeAgencyFeedbackCollection = client
+      .db(`${process.env.DB_NAME}`)
+      .collection(`${process.env.DB_COLLECTION3}`);
+   const creativeAgencyAddAdminCollection = client
+      .db(`${process.env.DB_NAME}`)
+      .collection(`${process.env.DB_COLLECTION4}`);
    console.log("Database Has Successfully Connected");
 
    //** POST --> Insert Service Data & Save in Database */
@@ -85,12 +95,6 @@ client.connect((err) => {
          res.send(documents);
       });
    });
-});
-client.connect((err) => {
-   const creativeAgencySingleCollection = client
-      .db(`${process.env.DB_NAME}`)
-      .collection(`${process.env.DB_COLLECTION2}`);
-   console.log("Database Has Successfully Connected");
 
    //** POST --> Insert Single Service Data & Save in Database */
    app.post("/singleService", (req, res) => {
@@ -104,6 +108,38 @@ client.connect((err) => {
    //** GET --> Show All Single Service Data */
    app.get("/sService", (req, res) => {
       creativeAgencySingleCollection.find({}).toArray((err, documents) => {
+         res.send(documents);
+      });
+   });
+
+   //** POST --> Insert Single Service Data & Save in Database */
+   app.post("/review", (req, res) => {
+      const newReview = req.body;
+      creativeAgencyFeedbackCollection.insertOne(newReview).then((result) => {
+         console.log(result.insertedCount);
+         res.send(result.insertedCount > 0);
+      });
+   });
+
+   //** GET --> Show All Single Service Data */
+   app.get("/showFeedback", (req, res) => {
+      creativeAgencyFeedbackCollection.find({}).toArray((err, documents) => {
+         res.send(documents);
+      });
+   });
+
+   //** POST --> Insert Single Service Data & Save in Database */
+   app.post("/addAdmin", (req, res) => {
+      const newAdmin = req.body;
+      creativeAgencyAddAdminCollection.insertOne(newAdmin).then((result) => {
+         console.log(result.insertedCount);
+         res.send(result.insertedCount > 0);
+      });
+   });
+
+   //** GET --> Show All Single Service Data */
+   app.get("/admin", (req, res) => {
+      creativeAgencyAddAdminCollection.find({}).toArray((err, documents) => {
          res.send(documents);
       });
    });
