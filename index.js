@@ -58,7 +58,7 @@ client.connect((err) => {
       .collection(`${process.env.DB_COLLECTION}`);
    console.log("Database Has Successfully Connected");
 
-   //** POST --> Insert Data & Save Database */
+   //** POST --> Insert Service Data & Save in Database */
    app.post("/addService", (req, res) => {
       const file = req.files.files;
       const title = req.body.title;
@@ -79,8 +79,31 @@ client.connect((err) => {
          });
    });
 
+   //** GET --> Show All Service Data */
    app.get("/service", (req, res) => {
       creativeAgencyCollection.find({}).toArray((err, documents) => {
+         res.send(documents);
+      });
+   });
+});
+client.connect((err) => {
+   const creativeAgencySingleCollection = client
+      .db(`${process.env.DB_NAME}`)
+      .collection(`${process.env.DB_COLLECTION2}`);
+   console.log("Database Has Successfully Connected");
+
+   //** POST --> Insert Single Service Data & Save in Database */
+   app.post("/singleService", (req, res) => {
+      const newSingle = req.body;
+      creativeAgencySingleCollection.insertOne(newSingle).then((result) => {
+         console.log(result.insertedCount);
+         res.send(result.insertedCount > 0);
+      });
+   });
+
+   //** GET --> Show All Single Service Data */
+   app.get("/sService", (req, res) => {
+      creativeAgencySingleCollection.find({}).toArray((err, documents) => {
          res.send(documents);
       });
    });
