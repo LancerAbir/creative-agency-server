@@ -107,6 +107,16 @@ client.connect((err) => {
 
    //** GET --> Show All Single Service Data */
    app.get("/sService", (req, res) => {
+      console.log(req.query.email);
+      creativeAgencySingleCollection
+         .find({ email: req.query.email })
+         .toArray((err, documents) => {
+            res.send(documents);
+         });
+   });
+
+   //** GET --> Show All Single Service Data */
+   app.get("/showService", (req, res) => {
       creativeAgencySingleCollection.find({}).toArray((err, documents) => {
          res.send(documents);
       });
